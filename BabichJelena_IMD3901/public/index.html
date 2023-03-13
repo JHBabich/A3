@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A3 - Stacking Game</title>
+    <meta name="description" content="A3 - Forgiveness Clause">
+</head>
+<script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+<script src="https://unpkg.com/aframe-environment-component/dist/aframe-environment-component.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aframe-blink-controls/dist/aframe-blink-controls.min.js"></script>
+<script src="https://raw.githubusercontent.com/aframevr/aframe/master/examples/docs/aincraft/components/snap.js"></script>
+<!-- Grab Box Script -->
+<script>
+    AFRAME.registerComponent('intersection-spawn', {
+  schema: {
+    default: '',
+    parse: AFRAME.utils.styleParser.parse
+  },
+
+  init: function () {
+    var data = this.data;
+    var el = this.el;
+    el.addEventListener(data.event, evt => {
+        var newBlockEl = document.createElement('a-entity');
+        newBlockEl.setAttribute('mixin', 'block');
+        var normal = evt.detail.intersection.face.normal;
+        normal.multiplyScalar(0.25);
+        var position = evt.detail.intersection.point;
+        position.add(normal);
+        newBlockEl.setAttribute('position', position);
+        this.appendChild(newBlockEl);
+    });
+    }
+});
+</script>
+</head>
+<body>
+<!-- A-Frame scene - al A-Frame entities must go in the scene -->
+<a-scene>
+
+    <!-- Controls -->
+
+    <a-entity camera wasd-controls look-controls position="0 1.6 0">
+        <a-entity 
+            cursor="rayOrigin:mouse;" 
+            raycaster="far:20; interval:200; objects:.interactive"
+            acceleration="30"
+            intersection-spawn="event: click; mixin: block">
+        </a-entity>
+      </a-entity>
+        <a-entity id="teleHand" 
+            hand-controls="hand: left" 
+            teleport-controls="type: parabolic; collisionEntities: [mixin='block'], #ground">
+        </a-entity>
+        <a-entity id="blockHand"
+            hand-controls="hand: right" 
+            laser-controls intersection-spawn="event: click; mixin: block">
+        </a-entity>
+    </a-entity>
+
+    <!-- Onclick: Select Block and move it -->
+    <!-- ClickReleased: Drop block -->
+
+    <!-- Game -->
+    <a-mixin id="block"
+        position="0 1 -1"
+        geometry="primitive:box; width:0.5; height:0.5; depth:0.5"
+        material="color:#A3B7FF"
+        snap="offset: 0.25 0.25 0.25; snap: 0.5 0.5 0.5">
+    </a-mixin>
+
+    <!-- Block is ClickReleased: +10 Points to User -->
+
+    <!-- The Space -->
+    <a-entity id="room">
+        <a-entity class="ground"
+            geometry="primitive:plane; width:30; height:30;"
+            material="color:#1A1A28;"
+            position="0 0.5 0"
+            rotation="-90 0 0">
+        </a-entity>
+        <a-entity class="wall"
+            geometry="primitive:plane; width:30; height:30;"
+            material="color:#1A1A28;"
+            position="15 8 0"
+            rotation="0 -90 0">
+        </a-entity>
+        <a-entity class="wall"
+            geometry="primitive:plane; width:30; height:30;"
+            material="color:#1A1A28;"
+            position="-15 8 0"
+            rotation="0 90 0">
+        </a-entity>
+        <a-entity class="wall"
+            geometry="primitive:plane; width:30; height:30;"
+            material="color:#1A1A28;"
+            position="0 8 15"
+            rotation="0 180 0">
+        </a-entity>
+        <a-entity class="wall"
+            geometry="primitive:plane; width:30; height:30;"
+            material="color:#1A1A28;"
+            position="0 8 -15"
+            rotation="0 0 0">
+        </a-entity>
+      </a-entity>
+
+    <a-entity>
+        <a-entity environment="preset:starry;"></a-entity>
+    </a-entity>
+</a-scene>
+</body>
+</html>
